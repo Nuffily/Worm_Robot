@@ -66,7 +66,6 @@ public class MainApplicationFrame extends JFrame {
         else showMessageDialog(this, "Правильно, оставайся");
     }
 
-
     protected LogWindow createLogWindow() {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
         logWindow.setLocation(10, 10);
