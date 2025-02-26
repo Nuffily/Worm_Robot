@@ -11,7 +11,6 @@ import javax.swing.UIManager;
 public class RobotsProgram {
     public static void main(String[] args) {
 
-//        UIManager.getLookAndFeelDefaults().keySet().forEach(System.out::println);
         try {
             editUI();
         } catch (Exception e) {

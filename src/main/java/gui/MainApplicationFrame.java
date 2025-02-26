@@ -60,7 +60,8 @@ public class MainApplicationFrame extends JFrame {
     }
 
     protected void closeApprove() {
-        int ans = showConfirmDialog(this, "Вы правда хотите выйти?", "Подтвердите выход", YES_NO_OPTION);
+        int ans = showConfirmDialog(this, "Вы правда хотите выйти?",
+                "Подтвердите выход", YES_NO_OPTION);
 
         if (ans == 0) System.exit(0);
         else showMessageDialog(this, "Правильно, оставайся");
