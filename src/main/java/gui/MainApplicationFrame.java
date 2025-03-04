@@ -2,10 +2,6 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-
-import log.Logger;
-
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -16,11 +12,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import log.Logger;
+
+
+import java.awt.event.KeyEvent;
 
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 import static javax.swing.JOptionPane.showConfirmDialog;
 import static javax.swing.JOptionPane.showMessageDialog;
-
 
 /**
  * Что требуется сделать:
@@ -28,6 +27,23 @@ import static javax.swing.JOptionPane.showMessageDialog;
  * Следует разделить его на серию более простых методов (или вообще выделить отдельный класс).
  */
 public class MainApplicationFrame extends JFrame {
+
+    private class myJMenu extends JMenu {
+
+        myJMenu(String name, String Description, int Key) {
+            super(name);
+            setMnemonic(Key);
+            getAccessibleContext().setAccessibleDescription(Description);
+        }
+
+        public void addMenuButton(String name, int key, java.awt.event.ActionListener listener) {
+            JMenuItem item = new JMenuItem(name, key);
+            item.addActionListener(listener);
+            add(item);
+        }
+
+    }
+
     private final JDesktopPane desktopPane = new JDesktopPane();
 
     public MainApplicationFrame() {
@@ -79,90 +95,34 @@ public class MainApplicationFrame extends JFrame {
         frame.setVisible(true);
     }
 
-//    protected JMenuBar createMenuBar() {
-//        JMenuBar menuBar = new JMenuBar();
-// 
-//        //Set up the lone menu.
-//        JMenu menu = new JMenu("Document");
-//        menu.setMnemonic(KeyEvent.VK_D);
-//        menuBar.add(menu);
-// 
-//        //Set up the first menu item.
-//        JMenuItem menuItem = new JMenuItem("New");
-//        menuItem.setMnemonic(KeyEvent.VK_N);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_N, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("new");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-// 
-//        //Set up the second menu item.
-//        menuItem = new JMenuItem("Quit");
-//        menuItem.setMnemonic(KeyEvent.VK_Q);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("quit");
-
-    /// /        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-// 
-//        return menuBar;
-//    }
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu lookAndFeelMenu = new JMenu("Режим отображения");
-        lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
-        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(
-                "Управление режимом отображения приложения");
+        myJMenu lookAndFeelMenu = new myJMenu("Режим отображения",
+                "Управление режимом отображения приложения", KeyEvent.VK_V);
 
-        {
-            JMenuItem systemLookAndFeel = new JMenuItem("Системная схема", KeyEvent.VK_S);
-            systemLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(systemLookAndFeel);
-        }
+        lookAndFeelMenu.addMenuButton("Системная схема", KeyEvent.VK_S,
+                (_) -> setLookAndFeel(UIManager.getSystemLookAndFeelClassName()));
+        lookAndFeelMenu.addMenuButton("Универсальная схема", KeyEvent.VK_S,
+                (_) -> setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()));
+        lookAndFeelMenu.addMenuButton("Базовая схема", KeyEvent.VK_S,
+                (_) -> setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"));
 
-        {
-            JMenuItem crossplatformLookAndFeel = new JMenuItem("Универсальная схема", KeyEvent.VK_S);
-            crossplatformLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(crossplatformLookAndFeel);
-        }
-
-        JMenu testMenu = new JMenu("Тесты");
-        testMenu.setMnemonic(KeyEvent.VK_T);
-        testMenu.getAccessibleContext().setAccessibleDescription(
-                "Тестовые команды");
-
-        {
-            JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
-            addLogMessageItem.addActionListener((event) -> {
-                Logger.debug("Новая строка");
-            });
-            testMenu.add(addLogMessageItem);
-        }
-
-        JMenu closeMenu = new JMenu("Файл");
-        closeMenu.setMnemonic(KeyEvent.VK_Q);
-        closeMenu.getAccessibleContext().setAccessibleDescription(
-                "Закрытие программы");
-
-        {
-            JMenuItem addLogMessageItem = new JMenuItem("Выход", KeyEvent.VK_S);
-            addLogMessageItem.addActionListener((event) -> {
-                closeApprove();
-            });
-            closeMenu.add(addLogMessageItem);
-        }
-
-        menuBar.add(closeMenu);
         menuBar.add(lookAndFeelMenu);
+
+        myJMenu testMenu = new myJMenu("Тесты", "Тестовые команды", KeyEvent.VK_T);
+
+        testMenu.addMenuButton("Сообщение в лог", KeyEvent.VK_S,
+                (_) -> Logger.debug("Новая строка"));
+
         menuBar.add(testMenu);
+
+        myJMenu fileMenu = new myJMenu("Файл", "Программа", KeyEvent.VK_Q);
+
+        fileMenu.addMenuButton("Выход", KeyEvent.VK_S,
+                (_) -> closeApprove());
+
+        menuBar.add(fileMenu);
 
         return menuBar;
     }
