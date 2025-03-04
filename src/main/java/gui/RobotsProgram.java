@@ -1,36 +1,25 @@
 package gui;
 
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import java.awt.Font;
 
 public class RobotsProgram {
     public static void main(String[] args) {
 
         try {
-            editUI();
+            configureUI();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+
         SwingUtilities.invokeLater(() -> {
             MainApplicationFrame frame = new MainApplicationFrame();
-            frame.pack();
-            frame.setVisible(true);
-            frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-            frame.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    frame.closeApprove();
-                }
-            });
+            frame.initialize();
         });
     }
 
-    static private void editUI() throws Exception{
+    static private void configureUI() throws Exception {
         UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         UIManager.put("OptionPane.yesButtonText", "Да");
         UIManager.put("OptionPane.noButtonText", "Нет");

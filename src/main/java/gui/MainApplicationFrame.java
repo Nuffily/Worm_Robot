@@ -1,7 +1,7 @@
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import log.Logger;
+
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
@@ -12,9 +12,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
-import log.Logger;
-
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 import static javax.swing.JOptionPane.showConfirmDialog;
@@ -30,21 +34,29 @@ public class MainApplicationFrame extends JFrame {
             getAccessibleContext().setAccessibleDescription(Description);
         }
 
-        public void addMenuButton(String name, int key, java.awt.event.ActionListener listener) {
+        public void addMenuButton(String name, int key, ActionListener listener) {
             JMenuItem item = new JMenuItem(name, key);
             item.addActionListener(listener);
             add(item);
         }
-
     }
 
     private final JDesktopPane desktopPane = new JDesktopPane();
 
+    public void initialize() {
+        pack();
+        setVisible(true);
+        setExtendedState(Frame.MAXIMIZED_BOTH);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeApprove();
+            }
+        });
+    }
+
     public MainApplicationFrame() {
 
-
-        //Make the big window be indented 50 pixels from each edge
-        //of the screen.
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
@@ -52,7 +64,6 @@ public class MainApplicationFrame extends JFrame {
                 screenSize.height - inset * 2);
 
         setContentPane(desktopPane);
-
 
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
