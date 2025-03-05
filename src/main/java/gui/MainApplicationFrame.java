@@ -77,11 +77,10 @@ public class MainApplicationFrame extends JFrame {
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
 
-    protected void closeApprove() {
-        int ans = showConfirmDialog(this, "Вы правда хотите выйти?",
-                "Подтвердите выход", YES_NO_OPTION);
+    private void closeApprove() {
+        String answer = askYesNo("Вы правда хотите выйти?", "Подтвердите выход");
 
-        if (ans == 0) System.exit(0);
+        if (answer.equals("Yes")) System.exit(0);
         else showMessageDialog(this, "Правильно, оставайся");
     }
 
@@ -103,6 +102,7 @@ public class MainApplicationFrame extends JFrame {
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
+
         myJMenu lookAndFeelMenu = new myJMenu("Режим отображения",
                 "Управление режимом отображения приложения", KeyEvent.VK_V);
 
@@ -113,12 +113,14 @@ public class MainApplicationFrame extends JFrame {
         lookAndFeelMenu.addMenuButton("Базовая схема", KeyEvent.VK_S,
                 (_) -> setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"));
 
+
         menuBar.add(lookAndFeelMenu);
 
         myJMenu testMenu = new myJMenu("Тесты", "Тестовые команды", KeyEvent.VK_T);
 
         testMenu.addMenuButton("Сообщение в лог", KeyEvent.VK_S,
                 (_) -> Logger.debug("Новая строка"));
+
 
         menuBar.add(testMenu);
 
@@ -128,6 +130,7 @@ public class MainApplicationFrame extends JFrame {
                 (_) -> closeApprove());
 
         menuBar.add(fileMenu);
+
 
         return menuBar;
     }
@@ -141,5 +144,10 @@ public class MainApplicationFrame extends JFrame {
             showMessageDialog(this, "Схема не меняется...");
             Logger.debug(e.getMessage());
         }
+    }
+
+    private String askYesNo(String message, String title) {
+        int answer = showConfirmDialog(this, message, title, YES_NO_OPTION);
+        return (answer == 0) ? "Yes" : "No";
     }
 }
