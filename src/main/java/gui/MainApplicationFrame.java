@@ -7,15 +7,12 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Toolkit;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -26,34 +23,7 @@ import static javax.swing.JOptionPane.showMessageDialog;
 
 public class MainApplicationFrame extends JFrame {
 
-    private class myJMenu extends JMenu {
-
-        myJMenu(String name, String Description, int Key) {
-            super(name);
-            setMnemonic(Key);
-            getAccessibleContext().setAccessibleDescription(Description);
-        }
-
-        public void addMenuButton(String name, int key, ActionListener listener) {
-            JMenuItem item = new JMenuItem(name, key);
-            item.addActionListener(listener);
-            add(item);
-        }
-    }
-
     private final JDesktopPane desktopPane = new JDesktopPane();
-
-    public void initialize() {
-        pack();
-        setVisible(true);
-        setExtendedState(Frame.MAXIMIZED_BOTH);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                closeApprove();
-            }
-        });
-    }
 
     public MainApplicationFrame() {
 
@@ -77,21 +47,25 @@ public class MainApplicationFrame extends JFrame {
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
 
-    private void closeApprove() {
-        String answer = askYesNo("Вы правда хотите выйти?", "Подтвердите выход");
+    public void initialize() {
+        pack();
+        setVisible(true);
+        setExtendedState(Frame.MAXIMIZED_BOTH);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeApprove();
+            }
+        });
+    }
 
-        if (answer.equals("Yes")) System.exit(0);
+    private void closeApprove() {
+        if (shouldExit()) System.exit(0);
         else showMessageDialog(this, "Правильно, оставайся");
     }
 
     protected LogWindow createLogWindow() {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-        logWindow.setLocation(10, 10);
-        logWindow.setSize(300, 800);
-        setMinimumSize(logWindow.getSize());
-        logWindow.pack();
-        Logger.debug("Протокол работает");
-        return logWindow;
+        return new LogWindow(Logger.getDefaultLogSource());
     }
 
     protected void addWindow(JInternalFrame frame) {
@@ -102,8 +76,25 @@ public class MainApplicationFrame extends JFrame {
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
+        menuBar.add(createLookAndFeelMenu());
+        menuBar.add(createTestMenu());
+        menuBar.add(createFileMenu());
 
-        myJMenu lookAndFeelMenu = new myJMenu("Режим отображения",
+        return menuBar;
+    }
+
+    private void setLookAndFeel(String className) {
+        try {
+            UIManager.setLookAndFeel(className);
+            SwingUtilities.updateComponentTreeUI(this);
+        } catch (Exception e) {
+            showMessageDialog(this, "Схема не меняется...");
+            Logger.debug(e.getMessage());
+        }
+    }
+
+    private JMenu createLookAndFeelMenu() {
+        MyJMenu lookAndFeelMenu = new MyJMenu("Режим отображения",
                 "Управление режимом отображения приложения", KeyEvent.VK_V);
 
         lookAndFeelMenu.addMenuButton("Системная схема", KeyEvent.VK_S,
@@ -113,41 +104,29 @@ public class MainApplicationFrame extends JFrame {
         lookAndFeelMenu.addMenuButton("Базовая схема", KeyEvent.VK_S,
                 (_) -> setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"));
 
+        return lookAndFeelMenu;
+    }
 
-        menuBar.add(lookAndFeelMenu);
-
-        myJMenu testMenu = new myJMenu("Тесты", "Тестовые команды", KeyEvent.VK_T);
+    private JMenu createTestMenu() {
+        MyJMenu testMenu = new MyJMenu("Тесты", "Тестовые команды", KeyEvent.VK_T);
 
         testMenu.addMenuButton("Сообщение в лог", KeyEvent.VK_S,
                 (_) -> Logger.debug("Новая строка"));
 
+        return testMenu;
+    }
 
-        menuBar.add(testMenu);
-
-        myJMenu fileMenu = new myJMenu("Файл", "Программа", KeyEvent.VK_Q);
+    private JMenu createFileMenu() {
+        MyJMenu fileMenu = new MyJMenu("Файл", "Программа", KeyEvent.VK_Q);
 
         fileMenu.addMenuButton("Выход", KeyEvent.VK_S,
                 (_) -> closeApprove());
 
-        menuBar.add(fileMenu);
-
-
-        return menuBar;
+        return fileMenu;
     }
 
-    private void setLookAndFeel(String className) {
-        try {
-            UIManager.setLookAndFeel(className);
-            SwingUtilities.updateComponentTreeUI(this);
-        } catch (ClassNotFoundException | InstantiationException
-                 | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            showMessageDialog(this, "Схема не меняется...");
-            Logger.debug(e.getMessage());
-        }
-    }
-
-    private String askYesNo(String message, String title) {
-        int answer = showConfirmDialog(this, message, title, YES_NO_OPTION);
-        return (answer == 0) ? "Yes" : "No";
+    private Boolean shouldExit() {
+        return showConfirmDialog(this, "Вы правда хотите выйти?",
+                "Подтвердите выход", YES_NO_OPTION) == YES_NO_OPTION;
     }
 }

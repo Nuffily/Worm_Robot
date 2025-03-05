@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
+import log.Logger;
 
 public class LogWindow extends JInternalFrame implements LogChangeListener
 {
@@ -27,8 +28,13 @@ public class LogWindow extends JInternalFrame implements LogChangeListener
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_logContent, BorderLayout.CENTER);
         getContentPane().add(panel);
-        pack();
         updateLogContent();
+
+        setLocation(10, 10);
+        setSize(300, 800);
+        setMinimumSize(this.getSize());
+        pack();
+        Logger.debug("Протокол работает");
     }
 
     private void updateLogContent()
