@@ -24,8 +24,6 @@ import static javax.swing.JOptionPane.showMessageDialog;
 public class MainApplicationFrame extends JFrame {
 
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private final LogWindow logWindow;
-    private final GameWindow gameWindow;
     private final ApplicationState state;
 
     public MainApplicationFrame() {
@@ -38,10 +36,10 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        logWindow = new LogWindow(Logger.getDefaultLogSource());
+        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
         addWindow(logWindow);
 
-        gameWindow = new GameWindow();
+        GameWindow gameWindow = new GameWindow();
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
