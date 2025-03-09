@@ -8,5 +8,6 @@ eclipse.bat
 out
 
 /.idea
+target
 
 /out

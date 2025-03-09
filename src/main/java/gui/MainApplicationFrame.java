@@ -1,5 +1,6 @@
 package gui;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import log.Logger;
 
 import javax.swing.JDesktopPane;
@@ -24,6 +25,9 @@ import static javax.swing.JOptionPane.showMessageDialog;
 public class MainApplicationFrame extends JFrame {
 
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final LogWindow logWindow;
+    private final GameWindow gameWindow;
+    private final ApplicationState state;
 
     public MainApplicationFrame() {
 
@@ -35,14 +39,17 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        LogWindow logWindow = createLogWindow();
+        logWindow = createLogWindow();
         addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow();
+        gameWindow = new GameWindow();
         gameWindow.setSize(400, 400);
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
+
+        state = new ApplicationState(gameWindow, logWindow);
+        state.uploadAppState();
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
@@ -60,7 +67,10 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private void closeApprove() {
-        if (shouldExit()) System.exit(0);
+        if (shouldExit()) {
+            state.saveAppState();
+            System.exit(0);
+        }
         else showMessageDialog(this, "Правильно, оставайся");
     }
 
