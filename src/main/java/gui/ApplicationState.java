@@ -2,8 +2,6 @@ package gui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.swing.JInternalFrame;
-import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.IOException;
 
@@ -14,7 +12,8 @@ public class ApplicationState {
     private LogWindow logWindow;
     private GameWindow gameWindow;
 
-    public ApplicationState() {}
+    public ApplicationState() {
+    }
 
     public ApplicationState(GameWindow gameWindow, LogWindow logWindow) {
         this.logWindow = logWindow;
@@ -29,6 +28,7 @@ public class ApplicationState {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     public void uploadAppState() {
@@ -36,8 +36,17 @@ public class ApplicationState {
         try {
             applicationState = new ObjectMapper().readValue(new File("state.json"), ApplicationState.class);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            applicationState.logWindowState.toDefaultLogWindowState();
+            applicationState.gameWindowState.toDefaultGameWindowState();
+            return;
         }
+
+        if (applicationState.logWindowState.isClosed())
+            applicationState.logWindowState.toDefaultLogWindowState();
+
+        if (applicationState.gameWindowState.isClosed())
+            applicationState.gameWindowState.toDefaultGameWindowState();
+
         applicationState.logWindowState.changeState(logWindow);
         applicationState.gameWindowState.changeState(gameWindow);
     }

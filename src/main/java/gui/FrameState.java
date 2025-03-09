@@ -12,7 +12,8 @@ public class FrameState {
     private boolean icon;
     private boolean closed;
 
-    public FrameState() {}
+    public FrameState() {
+    }
 
     public FrameState(JInternalFrame frame) {
         location = frame.getLocation();
@@ -30,6 +31,20 @@ public class FrameState {
         } catch (PropertyVetoException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public void toDefaultLogWindowState() {
+        location = new Point(10, 10);
+        size = new Dimension(200, 500);
+        closed = false;
+        icon = false;
+    }
+
+    public void toDefaultGameWindowState() {
+        location = new Point(220, 10);
+        size = new Dimension(600, 500);
+        closed = false;
+        icon = false;
     }
 
     public Dimension getSize() {

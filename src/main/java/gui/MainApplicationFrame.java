@@ -1,6 +1,5 @@
 package gui;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import log.Logger;
 
 import javax.swing.JDesktopPane;
@@ -39,11 +38,10 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        logWindow = createLogWindow();
+        logWindow = new LogWindow(Logger.getDefaultLogSource());
         addWindow(logWindow);
 
         gameWindow = new GameWindow();
-        gameWindow.setSize(400, 400);
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
@@ -70,12 +68,7 @@ public class MainApplicationFrame extends JFrame {
         if (shouldExit()) {
             state.saveAppState();
             System.exit(0);
-        }
-        else showMessageDialog(this, "Правильно, оставайся");
-    }
-
-    protected LogWindow createLogWindow() {
-        return new LogWindow(Logger.getDefaultLogSource());
+        } else showMessageDialog(this, "Правильно, оставайся");
     }
 
     protected void addWindow(JInternalFrame frame) {
