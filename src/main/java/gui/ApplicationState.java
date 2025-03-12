@@ -6,8 +6,9 @@ import java.io.File;
 import java.io.IOException;
 
 public class ApplicationState {
-    private FrameState logWindowState = new FrameState();;
-    private FrameState gameWindowState = new FrameState();;
+    private FrameState logWindowState = new FrameState();
+
+    private FrameState gameWindowState = new FrameState();
 
     private LogWindow logWindow;
     private GameWindow gameWindow;
