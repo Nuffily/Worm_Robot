@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class ApplicationState {
-    private FrameState logWindowState;
-    private FrameState gameWindowState;
+    private FrameState logWindowState = new FrameState();;
+    private FrameState gameWindowState = new FrameState();;
 
     private LogWindow logWindow;
     private GameWindow gameWindow;
@@ -35,7 +35,7 @@ public class ApplicationState {
         ApplicationState applicationState = new ApplicationState();
         try {
             applicationState = new ObjectMapper().readValue(new File("state.json"), ApplicationState.class);
-        } catch (IOException e) {
+        } catch (Exception e) {
             applicationState.logWindowState.toDefaultLogWindowState();
             applicationState.gameWindowState.toDefaultGameWindowState();
             return;
