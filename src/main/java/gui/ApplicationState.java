@@ -13,7 +13,6 @@ import java.io.Serializable;
 
 public class ApplicationState implements Serializable {
     private FrameState logWindowState = new FrameState();
-
     private FrameState gameWindowState = new FrameState();
 
     private transient LogWindow logWindow;

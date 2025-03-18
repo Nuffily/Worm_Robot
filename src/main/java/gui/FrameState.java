@@ -57,5 +57,4 @@ public class FrameState implements Serializable {
     public boolean IsClosed() {
         return isClosed;
     }
-
 }
