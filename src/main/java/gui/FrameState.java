@@ -2,9 +2,10 @@ package gui;
 
 import javax.swing.JInternalFrame;
 import java.beans.PropertyVetoException;
+import java.io.Serializable;
 
 
-public class FrameState {
+public class FrameState implements Serializable {
     private int locationX;
     private int locationY;
     private int width;
@@ -53,27 +54,8 @@ public class FrameState {
         isHidden = false;
     }
 
-    public int getLocationX() {
-        return locationX;
-    }
-
-    public int getLocationY() {
-        return locationY;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public boolean getIsClosed() {
+    public boolean IsClosed() {
         return isClosed;
     }
 
-    public boolean getIsHidden() {
-        return isHidden;
-    }
 }

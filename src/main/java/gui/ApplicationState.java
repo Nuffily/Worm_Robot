@@ -1,19 +1,25 @@
 package gui;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.Serializable;
 
-public class ApplicationState {
+public class ApplicationState implements Serializable {
     private FrameState logWindowState = new FrameState();
 
     private FrameState gameWindowState = new FrameState();
 
-    private LogWindow logWindow;
-    private GameWindow gameWindow;
+    private transient LogWindow logWindow;
+    private transient GameWindow gameWindow;
 
-    public ApplicationState() {
+    private ApplicationState() {
     }
 
     public ApplicationState(GameWindow gameWindow, LogWindow logWindow) {
@@ -24,8 +30,11 @@ public class ApplicationState {
     public void saveAppState() {
         this.logWindowState = new FrameState(logWindow);
         this.gameWindowState = new FrameState(gameWindow);
-        try {
-            new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(new File(getHome() + "/state.json"), this);
+
+        try (OutputStream os = new FileOutputStream(getHome() + "/state.bin");
+             ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(os))) {
+            oos.writeObject(this);
+            oos.flush();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -34,17 +43,20 @@ public class ApplicationState {
 
     public void uploadAppState() {
         ApplicationState applicationState = new ApplicationState();
-        try {
-            applicationState = new ObjectMapper().readValue(new File(getHome() + "/state.json"), ApplicationState.class);
-        } catch (Exception e) {
+
+        try (InputStream is = new FileInputStream(getHome() + "/state.bin");
+             ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(is))) {
+            applicationState = (ApplicationState)  ois.readObject();
+
+        } catch (IOException | ClassNotFoundException e) {
             applicationState.logWindowState.toDefaultLogWindowState();
             applicationState.gameWindowState.toDefaultGameWindowState();
         }
 
-        if (applicationState.logWindowState.getIsClosed())
+        if (applicationState.logWindowState.IsClosed())
             applicationState.logWindowState.toDefaultLogWindowState();
 
-        if (applicationState.gameWindowState.getIsClosed())
+        if (applicationState.gameWindowState.IsClosed())
             applicationState.gameWindowState.toDefaultGameWindowState();
 
         applicationState.logWindowState.changeState(logWindow);
@@ -58,14 +70,4 @@ public class ApplicationState {
         }
         return home;
     }
-
-    public FrameState getGameWindowState() {
-        return gameWindowState;
-    }
-
-    public FrameState getLogWindowState() {
-        return logWindowState;
-    }
-
-
 }
