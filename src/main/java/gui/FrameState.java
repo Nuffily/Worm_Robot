@@ -1,65 +1,79 @@
 package gui;
 
 import javax.swing.JInternalFrame;
-import java.awt.Dimension;
-import java.awt.Point;
 import java.beans.PropertyVetoException;
 
 
 public class FrameState {
-    private Point location;
-    private Dimension size;
-    private boolean icon;
-    private boolean closed;
+    private int locationX;
+    private int locationY;
+    private int width;
+    private int height;
+    private boolean isHidden;
+    private boolean isClosed;
 
     public FrameState() {
     }
 
     public FrameState(JInternalFrame frame) {
-        location = frame.getLocation();
-        size = frame.getSize();
-        icon = frame.isIcon();
-        closed = frame.isClosed();
+        locationX = frame.getLocation().x;
+        locationY = frame.getLocation().y;
+        width = frame.getSize().width;
+        height = frame.getSize().height;
+        isHidden = frame.isIcon();
+        isClosed = frame.isClosed();
     }
 
     public void changeState(JInternalFrame frame) {
         try {
-            frame.setLocation(this.getLocation());
-            frame.setSize(this.getSize());
-            frame.setIcon(this.isIcon());
-            frame.setClosed(this.isClosed());
+            frame.setLocation(locationX, locationY);
+            frame.setSize(width, height);
+            frame.setIcon(isHidden);
+            frame.setClosed(isClosed);
         } catch (PropertyVetoException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void toDefaultLogWindowState() {
-        location = new Point(10, 10);
-        size = new Dimension(200, 500);
-        closed = false;
-        icon = false;
+        locationX = 10;
+        locationY = 10;
+        width = 200;
+        height = 500;
+        isClosed = false;
+        isHidden = false;
     }
 
     public void toDefaultGameWindowState() {
-        location = new Point(220, 10);
-        size = new Dimension(600, 500);
-        closed = false;
-        icon = false;
+        locationX = 220;
+        locationY = 10;
+        width = 600;
+        height = 500;
+        isClosed = false;
+        isHidden = false;
     }
 
-    public Dimension getSize() {
-        return size;
+    public int getLocationX() {
+        return locationX;
     }
 
-    public boolean isClosed() {
-        return closed;
+    public int getLocationY() {
+        return locationY;
     }
 
-    public Point getLocation() {
-        return location;
+    public int getWidth() {
+        return width;
     }
 
-    public boolean isIcon() {
-        return icon;
+    public int getHeight() {
+        return height;
+    }
+
+    public boolean getIsClosed() {
+        return isClosed;
+    }
+
+    public boolean getIsHidden() {
+        return isHidden;
     }
 }

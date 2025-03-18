@@ -25,7 +25,7 @@ public class ApplicationState {
         this.logWindowState = new FrameState(logWindow);
         this.gameWindowState = new FrameState(gameWindow);
         try {
-            new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(new File("state.json"), this);
+            new ObjectMapper().writerWithDefaultPrettyPrinter().writeValue(new File(getHome() + "/state.json"), this);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -35,21 +35,28 @@ public class ApplicationState {
     public void uploadAppState() {
         ApplicationState applicationState = new ApplicationState();
         try {
-            applicationState = new ObjectMapper().readValue(new File("state.json"), ApplicationState.class);
+            applicationState = new ObjectMapper().readValue(new File(getHome() + "/state.json"), ApplicationState.class);
         } catch (Exception e) {
             applicationState.logWindowState.toDefaultLogWindowState();
             applicationState.gameWindowState.toDefaultGameWindowState();
-            return;
         }
 
-        if (applicationState.logWindowState.isClosed())
+        if (applicationState.logWindowState.getIsClosed())
             applicationState.logWindowState.toDefaultLogWindowState();
 
-        if (applicationState.gameWindowState.isClosed())
+        if (applicationState.gameWindowState.getIsClosed())
             applicationState.gameWindowState.toDefaultGameWindowState();
 
         applicationState.logWindowState.changeState(logWindow);
         applicationState.gameWindowState.changeState(gameWindow);
+    }
+
+    private String getHome() {
+        String home = System.getProperty("user.home");
+        if (home == null) {
+            home = System.getenv("HOME");
+        }
+        return home;
     }
 
     public FrameState getGameWindowState() {
