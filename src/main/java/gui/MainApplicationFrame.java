@@ -16,6 +16,8 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 import static javax.swing.JOptionPane.showConfirmDialog;
@@ -25,6 +27,8 @@ public class MainApplicationFrame extends JFrame {
 
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final ApplicationState state;
+    private final Map<String, JInternalFrame> windows;
+
 
     public MainApplicationFrame() {
 
@@ -36,16 +40,19 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
+        windows = new HashMap<>();
+
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
         addWindow(logWindow);
+        windows.put("logWindow", logWindow);
 
         GameWindow gameWindow = new GameWindow();
         addWindow(gameWindow);
+        windows.put("gameWindow", gameWindow);
 
         setJMenuBar(generateMenuBar());
 
-        state = new ApplicationState(gameWindow, logWindow);
-        state.uploadAppState();
+        state = new ApplicationState(windows);
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
@@ -64,7 +71,7 @@ public class MainApplicationFrame extends JFrame {
 
     private void closeApprove() {
         if (shouldExit()) {
-            state.saveAppState();
+            state.saveAppState(windows);
             System.exit(0);
         } else showMessageDialog(this, "Правильно, оставайся");
     }

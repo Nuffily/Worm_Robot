@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class FrameState implements Serializable {
     private int locationX;
     private int locationY;
-    private int width;
+    public int width;
     private int height;
     private boolean isHidden;
     private boolean isClosed;
@@ -25,34 +25,39 @@ public class FrameState implements Serializable {
         isClosed = frame.isClosed();
     }
 
+    public FrameState(String name) {
+        switch (name) {
+            case "logWindow":
+                locationX = 10;
+                locationY = 10;
+                width = 200;
+                height = 500;
+                isClosed = false;
+                isHidden = false;
+                break;
+            case "gameWindow":
+                locationX = 220;
+                locationY = 10;
+                width = 600;
+                height = 500;
+                isClosed = false;
+                isHidden = false;
+                break;
+        }
+    }
+
     public void changeState(JInternalFrame frame) {
         try {
             frame.setLocation(locationX, locationY);
             frame.setSize(width, height);
             frame.setIcon(isHidden);
-            frame.setClosed(isClosed);
+            if (IsClosed())
+                frame.setClosed(isClosed);
         } catch (PropertyVetoException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    public void toDefaultLogWindowState() {
-        locationX = 10;
-        locationY = 10;
-        width = 200;
-        height = 500;
-        isClosed = false;
-        isHidden = false;
-    }
-
-    public void toDefaultGameWindowState() {
-        locationX = 220;
-        locationY = 10;
-        width = 600;
-        height = 500;
-        isClosed = false;
-        isHidden = false;
-    }
 
     public boolean IsClosed() {
         return isClosed;

@@ -1,7 +1,9 @@
 package gui;
 
+import javax.swing.JInternalFrame;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,27 +12,42 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ApplicationState implements Serializable {
-    private FrameState logWindowState = new FrameState();
-    private FrameState gameWindowState = new FrameState();
 
-    private transient LogWindow logWindow;
-    private transient GameWindow gameWindow;
+    private Map<String, FrameState> states;
 
     private ApplicationState() {
     }
 
-    public ApplicationState(GameWindow gameWindow, LogWindow logWindow) {
-        this.logWindow = logWindow;
-        this.gameWindow = gameWindow;
+    public ApplicationState(Map<String, JInternalFrame> frames) {
+
+        uploadAppState(frames);
+
+        for (String windowName : frames.keySet()) {
+            if (!states.containsKey(windowName) || states.get(windowName).IsClosed())
+                new FrameState(windowName).changeState(frames.get(windowName));
+            else
+                states.get(windowName).changeState(frames.get(windowName));
+        }
     }
 
-    public void saveAppState() {
-        this.logWindowState = new FrameState(logWindow);
-        this.gameWindowState = new FrameState(gameWindow);
+    public void saveAppState(Map<String, JInternalFrame> frames) {
 
-        try (OutputStream os = new FileOutputStream(getHome() + "/state.bin");
+        states = new HashMap<>();
+
+        for (String windowName : frames.keySet()) {
+            states.put(windowName, new FrameState(frames.get(windowName)));
+        }
+
+        File directory = new File(getHome() + "/Worm_robot");
+
+        if (!directory.exists())
+            directory.mkdir();
+
+        try (OutputStream os = new FileOutputStream(directory + "/state.bin");
              ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(os))) {
             oos.writeObject(this);
             oos.flush();
@@ -40,26 +57,20 @@ public class ApplicationState implements Serializable {
 
     }
 
-    public void uploadAppState() {
-        ApplicationState applicationState = new ApplicationState();
+    public void uploadAppState(Map<String, JInternalFrame> frames) {
+        ApplicationState applicationState;
 
-        try (InputStream is = new FileInputStream(getHome() + "/state.bin");
+        try (InputStream is = new FileInputStream(getHome() + "/Worm_robot/state.bin");
              ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(is))) {
-            applicationState = (ApplicationState)  ois.readObject();
-
+            applicationState = (ApplicationState) ois.readObject();
+            this.states = applicationState.states;
         } catch (IOException | ClassNotFoundException e) {
-            applicationState.logWindowState.toDefaultLogWindowState();
-            applicationState.gameWindowState.toDefaultGameWindowState();
+
+            states = new HashMap<>();
+
+            for (String windowName : frames.keySet())
+                states.put(windowName, new FrameState(windowName));
         }
-
-        if (applicationState.logWindowState.IsClosed())
-            applicationState.logWindowState.toDefaultLogWindowState();
-
-        if (applicationState.gameWindowState.IsClosed())
-            applicationState.gameWindowState.toDefaultGameWindowState();
-
-        applicationState.logWindowState.changeState(logWindow);
-        applicationState.gameWindowState.changeState(gameWindow);
     }
 
     private String getHome() {
