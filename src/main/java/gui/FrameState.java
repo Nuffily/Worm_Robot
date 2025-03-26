@@ -8,7 +8,7 @@ import java.io.Serializable;
 public class FrameState implements Serializable {
     private int locationX;
     private int locationY;
-    public int width;
+    private int width;
     private int height;
     private boolean isHidden;
     private boolean isClosed;
