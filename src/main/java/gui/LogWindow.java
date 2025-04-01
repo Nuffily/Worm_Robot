@@ -1,5 +1,6 @@
 package gui;
 
+import interfaces.StateTrackable;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
@@ -10,8 +11,10 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.TextArea;
+import model.FrameType;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener {
+public class LogWindow extends JInternalFrame implements LogChangeListener, StateTrackable
+{
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
 
@@ -44,5 +47,16 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    public void toDefaultState() {
+        setLocation(10, 10);
+        setSize(200, 500);
+        isIcon = false;
+    }
+
+
+    public FrameType getId() {
+        return FrameType.LOG_WINDOW;
     }
 }

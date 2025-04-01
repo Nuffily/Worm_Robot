@@ -1,5 +1,6 @@
 package gui;
 
+import interfaces.StateTrackable;
 import log.Logger;
 
 import javax.swing.JDesktopPane;
@@ -27,7 +28,7 @@ public class MainApplicationFrame extends JFrame {
 
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final ApplicationState state;
-    private final Map<String, JInternalFrame> windows;
+    private final Map<String, JInternalFrame> windows = new HashMap<>();
 
 
     public MainApplicationFrame() {
@@ -40,15 +41,12 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        windows = new HashMap<>();
 
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
         addWindow(logWindow);
-        windows.put("logWindow", logWindow);
 
         GameWindow gameWindow = new GameWindow();
         addWindow(gameWindow);
-        windows.put("gameWindow", gameWindow);
 
         setJMenuBar(generateMenuBar());
 
@@ -79,6 +77,8 @@ public class MainApplicationFrame extends JFrame {
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
+        if (frame instanceof StateTrackable trackableFrame)
+            windows.put(trackableFrame.getId(), trackableFrame);
     }
 
     private JMenuBar generateMenuBar() {

@@ -1,5 +1,6 @@
 package gui;
 
+import interfaces.StateTrackable;
 import javax.swing.JInternalFrame;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -14,6 +15,7 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import model.FrameType;
 
 public class ApplicationState implements Serializable {
 
@@ -22,7 +24,7 @@ public class ApplicationState implements Serializable {
     private ApplicationState() {
     }
 
-    public ApplicationState(Map<String, JInternalFrame> frames) {
+    public ApplicationState(Map<FrameType, StateTrackable> frames) {
 
         uploadAppState(frames);
 
