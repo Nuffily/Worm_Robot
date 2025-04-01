@@ -25,26 +25,6 @@ public class FrameState implements Serializable {
         isClosed = frame.isClosed();
     }
 
-    public FrameState(String name) {
-        switch (name) {
-            case "logWindow":
-                locationX = 10;
-                locationY = 10;
-                width = 200;
-                height = 500;
-                isClosed = false;
-                isHidden = false;
-                break;
-            case "gameWindow":
-                locationX = 220;
-                locationY = 10;
-                width = 600;
-                height = 500;
-                isClosed = false;
-                isHidden = false;
-                break;
-        }
-    }
 
     public void changeState(JInternalFrame frame) {
         try {

@@ -1,11 +1,11 @@
 package gui;
 
-import interfaces.StateTrackable;
+import interfaces.MyFrame;
 import log.Logger;
+import model.FrameType;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
@@ -28,7 +28,7 @@ public class MainApplicationFrame extends JFrame {
 
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final ApplicationState state;
-    private final Map<String, JInternalFrame> windows = new HashMap<>();
+    private final Map<FrameType, MyFrame> windows = new HashMap<>();
 
 
     public MainApplicationFrame() {
@@ -74,11 +74,10 @@ public class MainApplicationFrame extends JFrame {
         } else showMessageDialog(this, "Правильно, оставайся");
     }
 
-    protected void addWindow(JInternalFrame frame) {
+    protected void addWindow(MyFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
-        if (frame instanceof StateTrackable trackableFrame)
-            windows.put(trackableFrame.getId(), trackableFrame);
+        windows.put(frame.getId(), frame);
     }
 
     private JMenuBar generateMenuBar() {

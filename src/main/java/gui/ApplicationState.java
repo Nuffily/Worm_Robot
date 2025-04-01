@@ -1,7 +1,8 @@
 package gui;
 
-import interfaces.StateTrackable;
-import javax.swing.JInternalFrame;
+import interfaces.MyFrame;
+import model.FrameType;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -15,41 +16,45 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import model.FrameType;
 
 public class ApplicationState implements Serializable {
 
-    private Map<String, FrameState> states;
+    private Map<FrameType, FrameState> states;
+
+    final private transient String directoryName = getHome() + "/Worm_robot";
+    final private transient String fileName = "/state.bin";
+
 
     private ApplicationState() {
     }
 
-    public ApplicationState(Map<FrameType, StateTrackable> frames) {
+    public ApplicationState(Map<FrameType, MyFrame> frames) {
+
 
         uploadAppState(frames);
 
-        for (String windowName : frames.keySet()) {
-            if (!states.containsKey(windowName) || states.get(windowName).IsClosed())
-                new FrameState(windowName).changeState(frames.get(windowName));
+        for (FrameType type : frames.keySet()) {
+            if (!states.containsKey(type) || states.get(type).IsClosed())
+                frames.get(type).toDefaultState();
             else
-                states.get(windowName).changeState(frames.get(windowName));
+                states.get(type).changeState(frames.get(type));
         }
     }
 
-    public void saveAppState(Map<String, JInternalFrame> frames) {
+    public void saveAppState(Map<FrameType, MyFrame> frames) {
 
         states = new HashMap<>();
 
-        for (String windowName : frames.keySet()) {
-            states.put(windowName, new FrameState(frames.get(windowName)));
+        for (FrameType type : frames.keySet()) {
+            states.put(type, new FrameState(frames.get(type)));
         }
 
-        File directory = new File(getHome() + "/Worm_robot");
+        File directory = new File(directoryName);
 
         if (!directory.exists())
             directory.mkdir();
 
-        try (OutputStream os = new FileOutputStream(directory + "/state.bin");
+        try (OutputStream os = new FileOutputStream(directoryName + fileName);
              ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(os))) {
             oos.writeObject(this);
             oos.flush();
@@ -59,10 +64,11 @@ public class ApplicationState implements Serializable {
 
     }
 
-    public void uploadAppState(Map<String, JInternalFrame> frames) {
+    public void uploadAppState(Map<FrameType, MyFrame> frames) {
+
         ApplicationState applicationState;
 
-        try (InputStream is = new FileInputStream(getHome() + "/Worm_robot/state.bin");
+        try (InputStream is = new FileInputStream(directoryName + fileName);
              ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(is))) {
             applicationState = (ApplicationState) ois.readObject();
             this.states = applicationState.states;
@@ -70,8 +76,10 @@ public class ApplicationState implements Serializable {
 
             states = new HashMap<>();
 
-            for (String windowName : frames.keySet())
-                states.put(windowName, new FrameState(windowName));
+            for (FrameType type : frames.keySet()) {
+                frames.get(type).toDefaultState();
+                states.put(type, new FrameState(frames.get(type)));
+            }
         }
     }
 

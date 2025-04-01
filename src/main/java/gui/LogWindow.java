@@ -1,20 +1,18 @@
 package gui;
 
-import interfaces.StateTrackable;
+import interfaces.MyFrame;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 import log.Logger;
+import model.FrameType;
 
-import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.TextArea;
-import model.FrameType;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener, StateTrackable
-{
+public class LogWindow extends MyFrame implements LogChangeListener {
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
 
