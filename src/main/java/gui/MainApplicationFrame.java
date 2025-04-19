@@ -1,10 +1,11 @@
 package gui;
 
+import interfaces.MyFrame;
 import log.Logger;
+import model.FrameType;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.JInternalFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
@@ -16,6 +17,8 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.HashMap;
+import java.util.Map;
 
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 import static javax.swing.JOptionPane.showConfirmDialog;
@@ -24,6 +27,9 @@ import static javax.swing.JOptionPane.showMessageDialog;
 public class MainApplicationFrame extends JFrame {
 
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final ApplicationState state;
+    private final Map<FrameType, MyFrame> windows = new HashMap<>();
+
 
     public MainApplicationFrame() {
 
@@ -35,14 +41,16 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        LogWindow logWindow = createLogWindow();
+
+        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
         addWindow(logWindow);
 
         GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400, 400);
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
+
+        state = new ApplicationState(windows);
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     }
@@ -60,17 +68,16 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private void closeApprove() {
-        if (shouldExit()) System.exit(0);
-        else showMessageDialog(this, "Правильно, оставайся");
+        if (shouldExit()) {
+            state.saveAppState(windows);
+            System.exit(0);
+        } else showMessageDialog(this, "Правильно, оставайся");
     }
 
-    protected LogWindow createLogWindow() {
-        return new LogWindow(Logger.getDefaultLogSource());
-    }
-
-    protected void addWindow(JInternalFrame frame) {
+    protected void addWindow(MyFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
+        windows.put(frame.getId(), frame);
     }
 
     private JMenuBar generateMenuBar() {
