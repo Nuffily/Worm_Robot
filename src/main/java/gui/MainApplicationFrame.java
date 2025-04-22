@@ -157,9 +157,7 @@ public class MainApplicationFrame extends JFrame {
         localizator.getSupportedLocales().forEach((name, locale) -> {
             JMenuItem item = new JMenuItem(name);
 
-            item.addActionListener(e -> {
-                change(locale);
-            });
+            item.addActionListener(_ -> change(locale));
 
             languageMenu.add(item);
         });
