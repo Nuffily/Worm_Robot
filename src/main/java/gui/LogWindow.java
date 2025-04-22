@@ -17,7 +17,7 @@ public class LogWindow extends MyFrame implements LogChangeListener {
     private final TextArea m_logContent;
 
     public LogWindow(LogWindowSource logSource) {
-        super("Протокол работы", true, true, true, true);
+        super(LocalizationManager.getString("window.log"), true, true, true, true);
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
@@ -30,7 +30,11 @@ public class LogWindow extends MyFrame implements LogChangeListener {
 
         setMinimumSize(this.getSize());
         pack();
-        Logger.debug("Протокол работает");
+        Logger.debug(LocalizationManager.getString("window.log.first_message"));
+    }
+
+    public void updateLocale() {
+        setTitle(LocalizationManager.getString("window.log"));
     }
 
     private void updateLogContent() {
@@ -52,7 +56,6 @@ public class LogWindow extends MyFrame implements LogChangeListener {
         setSize(200, 500);
         isIcon = false;
     }
-
 
     public FrameType getId() {
         return FrameType.LOG_WINDOW;

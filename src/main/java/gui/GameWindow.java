@@ -10,7 +10,7 @@ public class GameWindow extends MyFrame {
     private final GameVisualizer m_visualizer;
 
     public GameWindow() {
-        super("Игровое поле", true, true, true, true);
+        super(LocalizationManager.getString("window.game"), true, true, true, true);
         m_visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_visualizer, BorderLayout.CENTER);
@@ -18,6 +18,9 @@ public class GameWindow extends MyFrame {
         pack();
     }
 
+    public void updateLocale() {
+        setTitle(LocalizationManager.getString("window.game"));
+    }
 
     public void toDefaultState() {
         setLocation(220, 10);
