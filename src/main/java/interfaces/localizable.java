@@ -1,5 +1,5 @@
 package interfaces;
 
-public interface localeUpdatable {
+public interface localizable {
     void updateLocale();
 }

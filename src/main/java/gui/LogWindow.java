@@ -15,9 +15,10 @@ import java.awt.TextArea;
 public class LogWindow extends MyFrame implements LogChangeListener {
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
+    private final LocalizationManager localizator;
 
-    public LogWindow(LogWindowSource logSource) {
-        super(LocalizationManager.getString("window.log"), true, true, true, true);
+    public LogWindow(LogWindowSource logSource, LocalizationManager localizator) {
+        super(localizator.getString("window.log"), true, true, true, true);
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
@@ -27,14 +28,15 @@ public class LogWindow extends MyFrame implements LogChangeListener {
         panel.add(m_logContent, BorderLayout.CENTER);
         getContentPane().add(panel);
         updateLogContent();
+        this.localizator = localizator;
 
         setMinimumSize(this.getSize());
         pack();
-        Logger.debug(LocalizationManager.getString("window.log.first_message"));
+        Logger.debug(localizator.getString("window.log.first_message"));
     }
 
     public void updateLocale() {
-        setTitle(LocalizationManager.getString("window.log"));
+        setTitle(localizator.getString("window.log"));
     }
 
     private void updateLogContent() {

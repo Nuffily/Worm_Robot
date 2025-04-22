@@ -1,41 +1,46 @@
 package gui;
 
-import interfaces.MyFrame;
-
 import javax.swing.JMenuItem;
 import java.awt.Component;
-import java.util.*;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
+import java.util.WeakHashMap;
 
 public class LocalizationManager {
-    private static Locale currentLocale = Locale.getDefault();
-    private static ResourceBundle resourceBundle = ResourceBundle.getBundle("messages", currentLocale);
-    private static final Map<String, Locale> supportedLocales = new LinkedHashMap<>();
-    private static final Map<Component, String> components = new WeakHashMap<>();
+    private Locale currentLocale = Locale.getDefault();
+    private ResourceBundle resourceBundle = ResourceBundle.getBundle("messages", currentLocale);
+    private final Map<String, Locale> supportedLocales = new LinkedHashMap<>();
+    private final Map<Component, String> components = new WeakHashMap<>();
 
-    static {
+
+    LocalizationManager() {
         supportedLocales.put("English", Locale.of("en"));
         supportedLocales.put("Русский", Locale.of("ru"));
     }
 
-    public static void addComponent(Component component, String key) {
+    public void addComponent(Component component, String key) {
         components.put(component, key);
     }
 
-    public static void updateAll() {
-        for ( Component comp: components.keySet()) {
+    public void updateAll() {
+        for (Component comp : components.keySet()) {
             if (comp instanceof JMenuItem) {
                 ((JMenuItem) comp).setText(getString(components.get(comp)));
             }
         }
     }
 
-    public static void setLocale(Locale locale) {
+    public void setLocale(Locale locale) {
         currentLocale = locale;
         resourceBundle = ResourceBundle.getBundle("messages", currentLocale);
     }
 
-    public static String getString(String key) {
+    public String getString(String key) {
         try {
             return resourceBundle.getString(key);
         } catch (MissingResourceException e) {
@@ -43,7 +48,7 @@ public class LocalizationManager {
         }
     }
 
-    public static String getFormattedString(String key, Object... args) {
+    public String getFormattedString(String key, Object... args) {
         try {
             return MessageFormat.format(resourceBundle.getString(key), args);
         } catch (MissingResourceException e) {
@@ -51,7 +56,7 @@ public class LocalizationManager {
         }
     }
 
-    public static Map<String, Locale> getSupportedLocales() {
+    public Map<String, Locale> getSupportedLocales() {
         return Collections.unmodifiableMap(supportedLocales);
     }
 }
