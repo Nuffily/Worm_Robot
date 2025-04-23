@@ -157,7 +157,7 @@ public class MainApplicationFrame extends JFrame {
         localizator.getSupportedLocales().forEach((name, locale) -> {
             JMenuItem item = new JMenuItem(name);
 
-            item.addActionListener(_ -> change(locale));
+            item.addActionListener(_ -> updateLocale(locale));
 
             languageMenu.add(item);
         });
@@ -166,15 +166,15 @@ public class MainApplicationFrame extends JFrame {
         return languageMenu;
     }
 
-    private void change(Locale locale) {
+    private void updateLocale(Locale locale) {
         localizator.setLocale(locale);
         setTitle(localizator.getString("app.title"));
 
         localizator.updateAll();
         configureUI();
 
-        for (localizable compomemt : toUpdate)
-            compomemt.updateLocale();
+        for (localizable component : toUpdate)
+            component.updateLocale();
 
         SwingUtilities.updateComponentTreeUI(this);
     }
