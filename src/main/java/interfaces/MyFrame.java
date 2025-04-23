@@ -2,7 +2,7 @@ package interfaces;
 
 import javax.swing.JInternalFrame;
 
-abstract public class MyFrame extends JInternalFrame implements StateTrackable, localizable {
+abstract public class MyFrame extends JInternalFrame implements StateTrackable, Localizable {
 
     public MyFrame(String title, boolean resizable, boolean closable,
                    boolean maximizable, boolean iconifiable) {

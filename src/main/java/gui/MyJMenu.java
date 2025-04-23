@@ -1,12 +1,12 @@
 package gui;
 
-import interfaces.localizable;
+import interfaces.Localizable;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import java.awt.event.ActionListener;
 
-class MyJMenu extends JMenu implements localizable {
+class MyJMenu extends JMenu implements Localizable {
     private final String nameKey;
     private final String descriptionKey;
     private final LocalizationManager localizator;

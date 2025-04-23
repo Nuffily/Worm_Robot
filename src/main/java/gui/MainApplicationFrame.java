@@ -1,6 +1,6 @@
 package gui;
 
-import interfaces.localizable;
+import interfaces.Localizable;
 import interfaces.MyFrame;
 import log.Logger;
 import model.FrameType;
@@ -33,7 +33,7 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final ApplicationState state;
     private final Map<FrameType, MyFrame> windows = new HashMap<>();
-    private final ArrayList<localizable> toUpdate = new ArrayList<>();
+    private final ArrayList<Localizable> toUpdate = new ArrayList<>();
     private final LocalizationManager localizator = new LocalizationManager();
 
     public MainApplicationFrame() {
@@ -173,7 +173,7 @@ public class MainApplicationFrame extends JFrame {
         localizator.updateAll();
         configureUI();
 
-        for (localizable component : toUpdate)
+        for (Localizable component : toUpdate)
             component.updateLocale();
 
         SwingUtilities.updateComponentTreeUI(this);
