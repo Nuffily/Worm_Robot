@@ -1,5 +1,6 @@
 package gui;
 
+import interfaces.Localizable;
 import interfaces.MyFrame;
 import log.Logger;
 import model.FrameType;
@@ -8,6 +9,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
@@ -17,7 +19,9 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static javax.swing.JOptionPane.YES_NO_OPTION;
@@ -29,9 +33,11 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final ApplicationState state;
     private final Map<FrameType, MyFrame> windows = new HashMap<>();
-
+    private final ArrayList<Localizable> toUpdate = new ArrayList<>();
+    private final LocalizationManager localizator = new LocalizationManager();
 
     public MainApplicationFrame() {
+        configureUI();
 
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -42,10 +48,10 @@ public class MainApplicationFrame extends JFrame {
         setContentPane(desktopPane);
 
 
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
+        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), localizator);
         addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow();
+        GameWindow gameWindow = new GameWindow(localizator);
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
@@ -71,13 +77,14 @@ public class MainApplicationFrame extends JFrame {
         if (shouldExit()) {
             state.saveAppState(windows);
             System.exit(0);
-        } else showMessageDialog(this, "Правильно, оставайся");
+        } else showMessageDialog(this, localizator.getString("app.stay_message"));
     }
 
     protected void addWindow(MyFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
         windows.put(frame.getId(), frame);
+        toUpdate.add(frame);
     }
 
     private JMenuBar generateMenuBar() {
@@ -86,6 +93,7 @@ public class MainApplicationFrame extends JFrame {
         menuBar.add(createLookAndFeelMenu());
         menuBar.add(createTestMenu());
         menuBar.add(createFileMenu());
+        menuBar.add(createLanguageMenu());
 
         return menuBar;
     }
@@ -95,45 +103,93 @@ public class MainApplicationFrame extends JFrame {
             UIManager.setLookAndFeel(className);
             SwingUtilities.updateComponentTreeUI(this);
         } catch (Exception e) {
-            showMessageDialog(this, "Схема не меняется...");
+            showMessageDialog(this, localizator.getString("app.scheme_error"));
             Logger.debug(e.getMessage());
         }
     }
 
     private JMenu createLookAndFeelMenu() {
-        MyJMenu lookAndFeelMenu = new MyJMenu("Режим отображения",
-                "Управление режимом отображения приложения", KeyEvent.VK_V);
+        MyJMenu lookAndFeelMenu = new MyJMenu("menu.scheme",
+                "menu.scheme.tooltip", KeyEvent.VK_V, localizator);
 
-        lookAndFeelMenu.addMenuButton("Системная схема", KeyEvent.VK_S,
+        lookAndFeelMenu.addMenuButton("menu.scheme.system", KeyEvent.VK_S,
                 (_) -> setLookAndFeel(UIManager.getSystemLookAndFeelClassName()));
-        lookAndFeelMenu.addMenuButton("Универсальная схема", KeyEvent.VK_S,
+        lookAndFeelMenu.addMenuButton("menu.scheme.universal", KeyEvent.VK_S,
                 (_) -> setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()));
-        lookAndFeelMenu.addMenuButton("Базовая схема", KeyEvent.VK_S,
+        lookAndFeelMenu.addMenuButton("menu.scheme.basic", KeyEvent.VK_S,
                 (_) -> setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel"));
 
+        toUpdate.add(lookAndFeelMenu);
         return lookAndFeelMenu;
     }
 
     private JMenu createTestMenu() {
-        MyJMenu testMenu = new MyJMenu("Тесты", "Тестовые команды", KeyEvent.VK_T);
+        MyJMenu testMenu = new MyJMenu("menu.tests",
+                "menu.tests.tooltip", KeyEvent.VK_T, localizator);
 
-        testMenu.addMenuButton("Сообщение в лог", KeyEvent.VK_S,
-                (_) -> Logger.debug("Новая строка"));
+        testMenu.addMenuButton("menu.tests.log_message", KeyEvent.VK_S,
+                (_) -> Logger.debug(localizator.getString("log.new_entry")));
+        testMenu.addMenuButton("menu.tests.log_messages", KeyEvent.VK_3,
+                (_) -> {
+                    for (int i = 0; i < 100; i++)
+                        Logger.debug(localizator.getFormattedString("log.multiple_entries", i));
+                });
 
+        toUpdate.add(testMenu);
         return testMenu;
     }
 
     private JMenu createFileMenu() {
-        MyJMenu fileMenu = new MyJMenu("Файл", "Программа", KeyEvent.VK_Q);
+        MyJMenu fileMenu = new MyJMenu("menu.file",
+                "menu.file.tooltip", KeyEvent.VK_Q, localizator);
 
-        fileMenu.addMenuButton("Выход", KeyEvent.VK_S,
+        fileMenu.addMenuButton("menu.file.exit", KeyEvent.VK_S,
                 (_) -> closeApprove());
 
+        toUpdate.add(fileMenu);
         return fileMenu;
     }
 
+    private JMenu createLanguageMenu() {
+        MyJMenu languageMenu = new MyJMenu("menu.language",
+                "menu.language.tooltip", KeyEvent.VK_L, localizator);
+
+        localizator.getSupportedLocales().forEach((name, locale) -> {
+            JMenuItem item = new JMenuItem(name);
+
+            item.addActionListener(_ -> updateLocale(locale));
+
+            languageMenu.add(item);
+        });
+
+        toUpdate.add(languageMenu);
+        return languageMenu;
+    }
+
+    private void updateLocale(Locale locale) {
+        localizator.setLocale(locale);
+        setTitle(localizator.getString("app.title"));
+
+        localizator.updateAll();
+        configureUI();
+
+        for (Localizable component : toUpdate)
+            component.updateLocale();
+
+        SwingUtilities.updateComponentTreeUI(this);
+    }
+
+    private void configureUI() {
+        setTitle(localizator.getString("app.title"));
+        UIManager.put("OptionPane.yesButtonText", localizator.getString("option.yes"));
+        UIManager.put("OptionPane.noButtonText", localizator.getString("option.no"));
+        UIManager.put("OptionPane.okButtonText", localizator.getString("option.ok"));
+        UIManager.put("OptionPane.messageDialogTitle", localizator.getString("option.message"));
+        UIManager.put("OptionPane.confirmDialogTitle", localizator.getString("option.confirm"));
+    }
+
     private Boolean shouldExit() {
-        return showConfirmDialog(this, "Вы правда хотите выйти?",
-                "Подтвердите выход", YES_NO_OPTION) == YES_NO_OPTION;
+        return showConfirmDialog(this, localizator.getString("app.exit_confirm"),
+                localizator.getString("app.exit_title"), YES_NO_OPTION) == YES_NO_OPTION;
     }
 }
