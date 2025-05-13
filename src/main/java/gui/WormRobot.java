@@ -5,7 +5,6 @@ import model.RobotTarget;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Observable;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -36,12 +35,12 @@ public class WormRobot {
                 onModelUpdateEvent();
             }
         }, 0, 10);
-
     }
 
     private static double distance(double x1, double y1, double x2, double y2) {
         double diffX = x1 - x2;
         double diffY = y1 - y2;
+
         return Math.sqrt(diffX * diffX + diffY * diffY);
     }
 
@@ -53,49 +52,50 @@ public class WormRobot {
     }
 
     protected void onModelUpdateEvent() {
-        double distance = distance(target.getX(), target.getY(),
-                robotX, robotY);
+        double distance = distance(target.getX(), target.getY(), robotX, robotY);
+
         if (distance < 0.5) {
             return;
         }
 
         double angleToTarget = angleTo(robotX, robotY, target.getX(), target.getY());
-        double angularVelocity;
-
-        double angle;
-
-        if (robotDirection - Math.PI > angleToTarget)
-            angle = angleToTarget + 2 * Math.PI - robotDirection;
-        else if (angleToTarget - Math.PI > robotDirection)
-            angle = angleToTarget - robotDirection - 2 * Math.PI;
-        else
-            angle = angleToTarget - robotDirection;
+        double angle = getAngleBetweenTwo(robotDirection, angleToTarget);
 
         boolean tooClose = distance < Math.sqrt(Math.abs(angle)) * 70;
-
-        System.out.println(angle);
-
-        if (Math.abs(angle) < 0.00001)
-            angularVelocity = 0;
-        if ((angle > 0 && !tooClose) || (angle < 0 && tooClose))
-            angularVelocity = maxAngularVelocity;
-        else
-            angularVelocity = -maxAngularVelocity;
+        double angularVelocity = getAngularVelocity(angle, tooClose);
 
         moveRobot(maxVelocity, angularVelocity, 10);
+    }
+
+    private double getAngularVelocity(double angle, boolean tooClose) {
+        if (Math.abs(angle) < 0.01)
+            return 0;
+        if ((angle > 0 && !tooClose) || (angle < 0 && tooClose))
+            return maxAngularVelocity;
+        else
+            return -maxAngularVelocity;
+    }
+
+    private double getAngleBetweenTwo(double firstAngle, double secondAngle) {
+        if (firstAngle - Math.PI > secondAngle)
+            return secondAngle + 2 * Math.PI - firstAngle;
+        else if (secondAngle - Math.PI > firstAngle)
+            return secondAngle - firstAngle - 2 * Math.PI;
+        else
+            return secondAngle - firstAngle;
     }
 
     private static double applyLimits(double value, double min, double max) {
         if (value < min)
             return min;
-        else if (value > max)
-            return max;
-        else return value;
+        else return Math.min(value, max);
     }
 
     private void moveRobot(double velocity, double angularVelocity, double duration) {
+
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
+
         double newX = robotX + velocity / angularVelocity *
                 (Math.sin(robotDirection + angularVelocity * duration) -
                         Math.sin(robotDirection));
@@ -110,8 +110,8 @@ public class WormRobot {
         }
         robotX = newX;
         robotY = newY;
-        double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration);
-        robotDirection = newDirection;
+
+        robotDirection = asNormalizedRadians(robotDirection + angularVelocity * duration);
 
         notifyListeners();
     }

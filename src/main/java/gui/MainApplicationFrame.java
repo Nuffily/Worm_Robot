@@ -63,8 +63,8 @@ public class MainApplicationFrame extends JFrame {
 
     private void addRobotMenus() {
 
-        RobotTarget target = new RobotTarget(150,100);
-        WormRobot wormRobot = new WormRobot(target,100,100);
+        RobotTarget target = new RobotTarget(150, 100);
+        WormRobot wormRobot = new WormRobot(target, 100, 100);
 
         GameWindow gameWindow = new GameWindow(localizator, wormRobot, target);
         addWindow(gameWindow);
