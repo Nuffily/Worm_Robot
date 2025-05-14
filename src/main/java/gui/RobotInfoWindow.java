@@ -24,6 +24,7 @@ public class RobotInfoWindow extends MyFrame {
         xLabel = new JLabel("X: " + 100, SwingConstants.CENTER);
         yLabel = new JLabel("Y: " + 100, SwingConstants.CENTER);
 
+        add(infoLabel);
         add(xLabel);
         add(yLabel);
 

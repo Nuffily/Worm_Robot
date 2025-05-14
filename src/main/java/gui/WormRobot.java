@@ -19,6 +19,7 @@ public class WormRobot {
 
     private final double maxVelocity = 0.1;
     private final double maxAngularVelocity = 0.001;
+    private final double tooCloseCoefficient = 80;
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
@@ -37,14 +38,14 @@ public class WormRobot {
         }, 0, 10);
     }
 
-    private static double distance(double x1, double y1, double x2, double y2) {
+    private double distance(double x1, double y1, double x2, double y2) {
         double diffX = x1 - x2;
         double diffY = y1 - y2;
 
         return Math.sqrt(diffX * diffX + diffY * diffY);
     }
 
-    private static double angleTo(double fromX, double fromY, double toX, double toY) {
+    private double angleTo(double fromX, double fromY, double toX, double toY) {
         double diffX = toX - fromX;
         double diffY = toY - fromY;
 
@@ -61,7 +62,7 @@ public class WormRobot {
         double angleToTarget = angleTo(robotX, robotY, target.getX(), target.getY());
         double angle = getAngleBetweenTwo(robotDirection, angleToTarget);
 
-        boolean tooClose = distance < Math.sqrt(Math.abs(angle)) * 70;
+        boolean tooClose = distance < Math.sqrt(Math.abs(angle)) * tooCloseCoefficient;
         double angularVelocity = getAngularVelocity(angle, tooClose);
 
         moveRobot(maxVelocity, angularVelocity, 10);
@@ -85,7 +86,7 @@ public class WormRobot {
             return secondAngle - firstAngle;
     }
 
-    private static double applyLimits(double value, double min, double max) {
+    private double applyLimits(double value, double min, double max) {
         if (value < min)
             return min;
         else return Math.min(value, max);
@@ -116,7 +117,7 @@ public class WormRobot {
         notifyListeners();
     }
 
-    private static double asNormalizedRadians(double angle) {
+    private double asNormalizedRadians(double angle) {
         while (angle < 0) {
             angle += 2 * Math.PI;
         }
