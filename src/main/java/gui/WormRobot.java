@@ -1,17 +1,12 @@
 package gui;
 
 import model.RobotState;
-import model.RobotTarget;
+import model.Point;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class WormRobot {
-
-    private final RobotTarget target;
-    private final Timer timer;
 
     private double robotX;
     private double robotY;
@@ -23,19 +18,9 @@ public class WormRobot {
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    public WormRobot(RobotTarget target, int x, int y) {
-        this.target = target;
+    public WormRobot(int x, int y) {
         robotX = x;
         robotY = y;
-
-        timer = new Timer("events generator", true);
-
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                onModelUpdateEvent();
-            }
-        }, 0, 10);
     }
 
     private double distance(double x1, double y1, double x2, double y2) {
@@ -52,7 +37,7 @@ public class WormRobot {
         return asNormalizedRadians(Math.atan2(diffY, diffX));
     }
 
-    protected void onModelUpdateEvent() {
+    protected void onModelUpdateEvent(Point target) {
         double distance = distance(target.getX(), target.getY(), robotX, robotY);
 
         if (distance < 0.5) {

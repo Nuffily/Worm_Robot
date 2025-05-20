@@ -1,14 +1,13 @@
 package gui;
 
 import model.RobotState;
-import model.RobotTarget;
+import model.Point;
 
 import javax.swing.JPanel;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -24,11 +23,11 @@ public class GameVisualizer extends JPanel {
 
     private volatile RobotState robotState;
 
-    private final RobotTarget target;
+    private final Point target;
 
-    public GameVisualizer(WormRobot robot, RobotTarget target) {
+    public GameVisualizer(WormRobot robot) {
 
-        this.target = target;
+        this.target = new Point(150, 100);
 
         m_timer.schedule(new TimerTask() {
             @Override
@@ -51,9 +50,17 @@ public class GameVisualizer extends JPanel {
             }
         });
         setDoubleBuffered(true);
+
+        m_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                robot.onModelUpdateEvent(target);
+            }
+        }, 0, 10);
+
     }
 
-    protected void setTargetPosition(Point p) {
+    protected void setTargetPosition(java.awt.Point p) {
         target.set(p.x, p.y);
     }
 

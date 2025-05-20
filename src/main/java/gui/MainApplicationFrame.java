@@ -4,7 +4,6 @@ import interfaces.Localizable;
 import interfaces.MyFrame;
 import log.Logger;
 import model.FrameType;
-import model.RobotTarget;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
@@ -63,10 +62,9 @@ public class MainApplicationFrame extends JFrame {
 
     private void addRobotMenus() {
 
-        RobotTarget target = new RobotTarget(150, 100);
-        WormRobot wormRobot = new WormRobot(target, 100, 100);
+        WormRobot wormRobot = new WormRobot(100, 100);
 
-        GameWindow gameWindow = new GameWindow(localizator, wormRobot, target);
+        GameWindow gameWindow = new GameWindow(localizator, wormRobot);
         addWindow(gameWindow);
 
         RobotInfoWindow robotInfoWindow = new RobotInfoWindow(localizator, wormRobot);
