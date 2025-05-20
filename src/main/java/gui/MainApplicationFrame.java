@@ -51,14 +51,24 @@ public class MainApplicationFrame extends JFrame {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), localizator);
         addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow(localizator);
-        addWindow(gameWindow);
+        addRobotMenus();
 
         setJMenuBar(generateMenuBar());
 
         state = new ApplicationState(windows);
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+    }
+
+    private void addRobotMenus() {
+
+        WormRobot wormRobot = new WormRobot(100, 100);
+
+        GameWindow gameWindow = new GameWindow(localizator, wormRobot);
+        addWindow(gameWindow);
+
+        RobotInfoWindow robotInfoWindow = new RobotInfoWindow(localizator, wormRobot);
+        addWindow(robotInfoWindow);
     }
 
     public void initialize() {
